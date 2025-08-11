@@ -28,19 +28,19 @@ class FeaturesSchema(BaseModel):
 
 
 class UserFeaturesBase(BaseModel):
-    user_id: str | None = Field(default=None, description="사용자 식별자 (선택)")
-    legacy_id: int | None = Field(default=None, description="기존 정수형 ID (Mongo 필드 'ID')")
+    user_id: str | None = Field(default=None, description="사용자 식별자 (Mongo 필드 'ID'와 매핑)")
     features: dict[str, Any] = Field(default_factory=dict, description="사용자 특성 (Mongo 필드 'Features')")
 
 
-class UserFeaturesCreate(UserFeaturesBase):
-    legacy_id: int = Field(alias="ID")
-    features: FeaturesSchema = Field(alias="Features")
+class UserFeaturesCreate(BaseModel):
+    # 실제 Mongo 'ID' 필드와 매핑되는 사용자 식별자
+    user_id: str = Field(alias="ID")
+    # Mongo 'Features' 필드와 매핑
+    features: FeaturesSchema | dict[str, Any] = Field(alias="Features")
 
 
 class UserFeaturesUpdate(BaseModel):
     user_id: str | None = None
-    legacy_id: int | None = None
     features: dict[str, Any] | None = None
 
 

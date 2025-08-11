@@ -60,4 +60,4 @@ def health() -> dict[str, str]:
     return {"status": "ok", "time": datetime.now(timezone.utc).isoformat()}
 
 
-app.include_router(user_features_router, prefix="/api/v1")
+app.include_router(user_features_router)

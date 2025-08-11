@@ -5,7 +5,6 @@ from ..repositories.user_features_repository import (
     create_user_features,
     delete_user_features_by_oid,
     delete_user_features_by_user_id,
-    get_user_features_by_legacy_id,
     get_user_features_by_oid,
     get_user_features_by_user_id,
     list_user_features,
@@ -61,17 +60,6 @@ async def get_by_user_id_route(
     db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> UserFeaturesResponse:
     doc = await get_user_features_by_user_id(db, user_id)
-    if doc is None:
-        raise HTTPException(status_code=404, detail="Not found")
-    return doc
-
-
-@router.get("/by-legacy/{legacy_id}", response_model=UserFeaturesResponse)
-async def get_by_legacy_id_route(
-    legacy_id: int,
-    db: AsyncIOMotorDatabase = Depends(get_db),
-) -> UserFeaturesResponse:
-    doc = await get_user_features_by_legacy_id(db, legacy_id)
     if doc is None:
         raise HTTPException(status_code=404, detail="Not found")
     return doc
