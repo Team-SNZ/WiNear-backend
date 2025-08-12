@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     # MongoDB Server API (Atlas 권장). 예: "1" (기본 활성화)
     mongodb_server_api: str | None = "1"
 
+    # OpenAI / LLM 설정
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-4o"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="WINEAR_",
