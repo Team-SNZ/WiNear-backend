@@ -10,6 +10,7 @@ from pymongo.server_api import ServerApi
 
 from .core.config import get_settings
 from .routers.user_features import router as user_features_router
+from .routers.chat import router as chat_router
 
 
 @asynccontextmanager
@@ -61,3 +62,4 @@ def health() -> dict[str, str]:
 
 
 app.include_router(user_features_router)
+app.include_router(chat_router)

@@ -11,7 +11,8 @@ dependencies = [
   "pydantic-settings>=2.2.1",
   "motor>=3.3.1",
   "python-dotenv>=1.0.1",
-  "pymongo>=4.8,<5"
+  "pymongo>=4.8,<5",
+  "langchain-openai>=0.1.6"
 ]
 
 [build-system]
