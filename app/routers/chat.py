@@ -81,17 +81,13 @@ async def end_chat(req: ChatEndRequest, db: AsyncIOMotorDatabase = Depends(get_d
     if st is None:
         raise HTTPException(status_code=404, detail="세션이 잘못되었거나 존재하지 않습니다.")
     if st.get("final_summary") is None:
-        st["final_summary"] = await _make_final_summary(st, db)
-        assistant_text = (
-            "당신의 적극적인 답변 덕분에 여행 성향을 보다 깊이 이해할 수 있게 되었어요!\n"
-            "이를 바탕으로 당신의 여행 메이트와 추천 여행지를 탐색해볼게요!"
-        )
-        return ChatResponse(
-            session_id=session_id,
-            assistant=assistant_text,
-            finished=True,
-            final_summary=st["final_summary"],
-        )
+    # 요약 저장이 완료되었으므로 외부 AI 백엔드에 추천 요청
+    ai_payload = {
+        "user_id": st["user_id"],
+        "summary": st["final_summary"],
+        # 필요한 추가 컨텍스트가 있다면 여기에 포함
+    }
+    ai_response = await request_recommendations(ai_payload)
 
     assistant = await _next_question(st)
     return ChatResponse(assistant=assistant, finished=False)

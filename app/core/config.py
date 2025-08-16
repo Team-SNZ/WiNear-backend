@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     # Redis 설정
     redis_url: str = "redis://localhost:6379/0"
 
+    # 외부 AI 백엔드 설정
+    ai_backend_url: str = "http://host.docker.internal:8081"
+    ai_backend_recommendations_path: str = "/api/recommendations"
+    ai_backend_timeout_seconds: float = 15.0
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="WINEAR_",
