@@ -3,8 +3,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class StartRequest(BaseModel):
-    user_id: int
+class ChatStartRequest(BaseModel):
+    user_id: str
 
 
 class ReplyRequest(BaseModel):
@@ -18,5 +18,9 @@ class ChatResponse(BaseModel):
     finished: bool
     draft_summary: Optional[str] = None
     final_summary: Optional[str] = None
+
+
+class ChatEndRequest(BaseModel):
+    session_id: str
 
 
