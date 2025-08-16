@@ -15,7 +15,7 @@ def _set_env(var: str) -> None:
         os.environ[var] = getpass.getpass(f"{var}: ")
 
 load_dotenv(override=True)
-_set_env("OPENAI_API_KEY")
+_set_env("WINEAR_OPENAI_API_KEY")
 
 llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
 client = MongoClient("mongodb+srv://sjy21ys:cjdthdtla12!@cluster0.ozrm81h.mongodb.net/")
@@ -142,5 +142,5 @@ def _make_final_summary(state: Dict) -> str:
     return llm_output
 
 if __name__ == "__main__":
-    print(f"OPENAI_API_KEY : {os.environ.get('OPENAI_API_KEY', 'API 토큰이 올바르지 않습니다.')}")
+    print(f"WINEAR_OPENAI_API_KEY : {os.environ.get('WINEAR_OPENAI_API_KEY', 'API 토큰이 올바르지 않습니다.')}")
     uvicorn.run("chat_fastapi:app", host="0.0.0.0", port=8000, reload=True)
