@@ -139,6 +139,7 @@ def _make_final_summary(state: Dict) -> str:
     )
     llm_input = [{"role": "system", "content": sys_prompt}] + state["messages"]
     llm_output = llm.invoke(llm_input).content.strip()
+    llm_output.lstrip("사용자:").strip()
     col_summary.update_one({"ID": state["user_id"]}, {"$set": {"Summary": llm_output}}, upsert=True)
     return llm_output
 
