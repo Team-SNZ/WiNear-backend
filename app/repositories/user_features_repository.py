@@ -72,7 +72,10 @@ async def get_user_features_by_oid(db: AsyncIOMotorDatabase, document_id: str) -
 
 
 async def get_user_features_by_user_id(db: AsyncIOMotorDatabase, user_id: str) -> UserFeaturesResponse | None:
-    doc = await db[COLLECTION].find_one({"ID": {"$in": _id_variants(user_id)}})
+    doc = await db[COLLECTION].find_one(
+        {"ID": {"$in": _id_variants(user_id)}},
+        sort=[("created_at", -1)]
+    )
     return _serialize(doc) if doc else None
 
 

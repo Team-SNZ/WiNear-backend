@@ -81,6 +81,10 @@ async def end_chat(req: ChatEndRequest, db: AsyncIOMotorDatabase = Depends(get_d
     if st is None:
         raise HTTPException(status_code=404, detail="세션이 잘못되었거나 존재하지 않습니다.")
     if st.get("final_summary") is None:
+        st["final_summary"] = await make_final_summary(st)
+        _logger.info(f"사용자 챗봇 요약 데이터 : {st['final_summary']}")
+        await upsert_user_summary(db, st["user_id"], st["final_summary"])  # type: ignore[index]
+        await update_session(redis, session_id, st)
     # 요약 저장이 완료되었으므로 외부 AI 백엔드에 추천 요청
     ai_payload = {
         "user_id": st["user_id"],
@@ -88,8 +92,13 @@ async def end_chat(req: ChatEndRequest, db: AsyncIOMotorDatabase = Depends(get_d
         # 필요한 추가 컨텍스트가 있다면 여기에 포함
     }
     ai_response = await request_recommendations(ai_payload)
-
-    assistant = await _next_question(st)
-    return ChatResponse(assistant=assistant, finished=False)
+    # 종료 시 세션 삭제 (필요 시 주석 처리)
+    await delete_session(redis, session_id)
+    return ChatResponse(
+        session_id=session_id,
+        assistant="대화를 종료했어요. 요약 결과를 저장했고, 추천을 요청했어요.",
+        finished=True,
+        final_summary=st["final_summary"],
+    )
 
 
