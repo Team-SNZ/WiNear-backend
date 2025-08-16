@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    env_file:
+      - .env
+    container_name: winear-api
+    environment:
+      - WINEAR_REDIS_URL=redis://redis:6379/0
+      - WINEAR_MONGODB_URI=${WINEAR_MONGODB_URI:-mongodb://host.docker.internal:27017}
+      - WINEAR_MONGODB_DB=${WINEAR_MONGODB_DB:-travel_recsys}
+      - WINEAR_MONGODB_SERVER_API=${WINEAR_MONGODB_SERVER_API:-1}
+      - WINEAR_ALLOWED_ORIGINS=${WINEAR_ALLOWED_ORIGINS:-*}
+      - WINEAR_OPENAI_API_KEY=${WINEAR_OPENAI_API_KEY}
+      - WINEAR_OPENAI_MODEL=${WINEAR_OPENAI_MODEL:-gpt-4o}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: winear-redis
+    ports:
+      - "6379:6379"
+    environment:
+      - LANG=C.UTF-8
+      - TZ=Asia/Seoul
+    restart: unless-stopped
+
+
