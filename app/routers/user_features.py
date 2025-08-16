@@ -31,7 +31,7 @@ def get_db(request: Request) -> AsyncIOMotorDatabase:
     return db
 
 
-@router.post("", response_model=dict)
+@router.post("", response_model=dict, summary="User-features 컬렉션에 새 데이터 등록")
 async def create_route(
     payload: UserFeaturesCreate,
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -40,7 +40,7 @@ async def create_route(
     return {"id": new_id}
 
 
-@router.get("/{document_id}", response_model=UserFeaturesResponse)
+@router.get("/{document_id}", response_model=UserFeaturesResponse, summary="User-features 컬렉션에서 objectId로 데이터 조회")
 async def get_by_oid_route(
     document_id: str = Path(..., description="ObjectId"),
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -54,7 +54,7 @@ async def get_by_oid_route(
     return doc
 
 
-@router.get("/by-user/{user_id}", response_model=UserFeaturesResponse)
+@router.get("/by-user/{user_id}", response_model=UserFeaturesResponse, summary="User-features 컬렉션에서 user_id로 데이터 조회")
 async def get_by_user_id_route(
     user_id: str,
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -74,7 +74,7 @@ async def list_route(
     return await list_user_features(db, limit=limit, offset=offset)
 
 
-@router.patch("/{document_id}", response_model=UserFeaturesResponse)
+@router.patch("/{document_id}", response_model=UserFeaturesResponse, summary="User-features 컬렉션에서 objectId로 데이터 수정")
 async def update_by_oid_route(
     document_id: str,
     data: UserFeaturesUpdate,
@@ -89,7 +89,7 @@ async def update_by_oid_route(
     return updated
 
 
-@router.patch("/by-user/{user_id}", response_model=UserFeaturesResponse)
+@router.patch("/by-user/{user_id}", response_model=UserFeaturesResponse, summary="User-features 컬렉션에서 user_id로 데이터 수정")
 async def update_by_user_id_route(
     user_id: str,
     data: UserFeaturesUpdate,
@@ -101,7 +101,7 @@ async def update_by_user_id_route(
     return updated
 
 
-@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT, summary="User-features 컬렉션에서 objectId로 데이터 삭제")
 async def delete_by_oid_route(
     document_id: str,
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -115,7 +115,7 @@ async def delete_by_oid_route(
     return None
 
 
-@router.delete("/by-user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/by-user/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="User-features 컬렉션에서 user_id로 데이터 삭제")
 async def delete_by_user_id_route(
     user_id: str,
     db: AsyncIOMotorDatabase = Depends(get_db),
