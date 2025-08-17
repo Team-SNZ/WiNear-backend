@@ -31,6 +31,8 @@ async def make_final_summary(state: Dict[str, Any]) -> str:
     llm = get_llm()
     ai_message = await llm.ainvoke(build_final_summary_prompt(state["messages"]))  # type: ignore[index]
     final_text = ai_message.content.strip()
+    if final_text.lstrip().startswith("사용자:"):
+        final_text = final_text.lstrip("사용자:").strip()
     return final_text
 
 def build_transcript(messages: List[Dict[str, str]]) -> str:
