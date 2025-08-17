@@ -31,6 +31,8 @@ async def make_final_summary(state: Dict[str, Any]) -> str:
     llm = get_llm()
     ai_message = await llm.ainvoke(build_final_summary_prompt(state["messages"]))  # type: ignore[index]
     final_text = ai_message.content.strip()
+    if final_text.lstrip().startswith("사용자:"):
+        final_text = final_text.lstrip("사용자:").strip()
     return final_text
 
 def build_transcript(messages: List[Dict[str, str]]) -> str:
@@ -51,7 +53,7 @@ def build_next_question_prompt(messages: List[Dict[str, str]]) -> str:
         f"{context}\n\n"
         "<지침>\n"
         "1. 위 대화를 분석해서 어떤 주제들이 이미 다뤄졌는지 파악하세요.\n"
-        "2. 대화가 없다면, \"더 구체적인 당신의 여행 성향을 파악하기 위해 몇 가지 질문을 준비했습니다. 생각나는대로 편하게 답변해주세요!\" 와 비슷한 분위기로, 임의로 한 가지 주제를 정해서 질문을 시작하세요.\n"
+        "2. 대화가 없다면, \"더 구체적인 당신의 여행 성향을 파악하기 위해 몇 가지 질문을 준비했습니다. 생각나는대로 편하게 답변해주세요!\" 와 함께 임의로 한 가지 주제를 정해서 질문을 시작하세요.\n"
         "3. 아직 다루지 않은 주제 중에서 가장 자연스럽게 이어갈 수 있는 하나를 선택하세요.\n"
         "4. 사용자의 이전 답변에 공감하며 자연스럽게 다음 질문으로 넘어가세요.\n\n"
         "상담가의 답변: "
@@ -63,7 +65,7 @@ def build_draft_summary_prompt(messages: List[Dict[str, str]]) -> str:
     sys_prompt = (
         "다음 대화는 사용자의 여행 성향을 파악하기 위한 Q&A입니다.\n"
         "먼저 사용자의 마지막 답변에 공감하세요.\n"
-        "그 후 지금까지의 사용자의 답변을 한 단락으로 누락 없이 정리한 후, 사용자에게 추가하고 싶은 내용이 있는지 피드백을 요청하세요."
+        "그 후 사용자에게 추가하고 싶은 본인의 여행 성향에 대한 정보가 있는지 피드백을 요청하세요."
     )
     return f"{sys_prompt}\n\n대화:\n{transcript}"
 
