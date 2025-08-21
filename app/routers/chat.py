@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import uuid
 from typing import Any, Dict
 
@@ -77,28 +76,22 @@ async def user_reply(
 @router.post("/end", response_model=ChatResponse, summary="채팅 종료 및 요약 확정")
 async def end_chat(req: ChatEndRequest, db: AsyncIOMotorDatabase = Depends(get_db), redis = Depends(get_redis)) -> ChatResponse:
     session_id = req.session_id
-    st = await get_session(redis, session_id)
-    if st is None:
+    session_data = await get_session(redis, session_id)
+    if session_data is None:
         raise HTTPException(status_code=404, detail="세션이 잘못되었거나 존재하지 않습니다.")
-    if st.get("final_summary") is None:
-        st["final_summary"] = await make_final_summary(st)
-        _logger.info(f"사용자 챗봇 요약 데이터 : {st['final_summary']}")
-        await upsert_user_summary(db, st["user_id"], st["final_summary"])  # type: ignore[index]
-        await update_session(redis, session_id, st)
-    # 요약 저장이 완료되었으므로 외부 AI 백엔드에 추천 요청
-    ai_payload = {
-        "user_id": st["user_id"],
-        "summary": st["final_summary"],
-        # 필요한 추가 컨텍스트가 있다면 여기에 포함
-    }
-    ai_response = await request_recommendations(ai_payload)
+    if session_data.get("final_summary") is None:
+        session_data["final_summary"] = await make_final_summary(session_data)
+        _logger.info(f"사용자 챗봇 요약 데이터 : {session_data['final_summary']}")
+        await upsert_user_summary(db, session_data["user_id"], session_data["final_summary"])  # type: ignore[index]
+        await update_session(redis, session_id, session_data)
+        
     # 종료 시 세션 삭제 (필요 시 주석 처리)
     await delete_session(redis, session_id)
     return ChatResponse(
         session_id=session_id,
         assistant="대화를 종료했어요. 요약 결과를 저장했고, 추천을 요청했어요.",
         finished=True,
-        final_summary=st["final_summary"],
+        final_summary=session_data["final_summary"],
     )
 
 
