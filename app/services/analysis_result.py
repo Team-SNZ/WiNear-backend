@@ -17,21 +17,17 @@ def map_doc_to_keyword(key: str, value: str | int | List[str], mappings: dict) -
     
     # 해당 키의 매핑이 있으면 사용
     if key in mappings:
-        logger.info(f"Mappings = {mappings}, key = {key}")
         if type(value) == list:
             mapped_value = []
             for v in value:
                 if v not in mappings[key]:
                     raise ValueError(f"value list에서 매핑을 찾을 수 없습니다: key='{key}', value='{v}'")
-                logger.info(f"mappings[key][v] = {mappings[key][v]}, v = {v}")
                 mapped_value.append(mappings[key][v])
-            logger.info(f"Mapped '{value}' to {mapped_value} for key '{key}'")
             return mapped_value
         else:
             if value not in mappings[key]:
                 raise ValueError(f"value에서 매핑을 찾을 수 없습니다: key='{key}', value='{value}'")
             mapped_value = mappings[key][value]
-            logger.info(f"Mapped '{value}' to {mapped_value} for key '{key}'")
             return mapped_value
     
     # 매핑이 없으면 0 반환
@@ -65,25 +61,24 @@ async def get_user_analysis_data(
     polygon_labels = POLYGON_LABELS
     polygon_values = [map_doc_to_keyword(label, doc.features.get(label, 0), NUMERIC_MAPPINGS) for label in polygon_labels]
     
-    logger.info(f"doc.features = {doc.features}")
     logger.info(f"polygon_values = {polygon_values}")
 
     # 여행 키워드 매핑
     travel_keywords_raw = [map_doc_to_keyword(schema, doc.features.get(schema, 0), TRAVEL_KEYWORD_MAPPINGS) for schema in TRAVEL_KEYWORD_MAPPINGS.keys()]
     travel_keywords = flatten_mapped_values(travel_keywords_raw)
-    logger.info(f"travel_keywords_raw = {travel_keywords_raw}")
+
     logger.info(f"travel_keywords = {travel_keywords}")
 
     # 개인 특성 키워드 매핑
     personal_keywords_raw = [map_doc_to_keyword(schema, doc.features.get(schema, 0), PERSONAL_KEYWORD_MAPPINGS) for schema in PERSONAL_KEYWORD_MAPPINGS.keys()]
     personal_keywords = flatten_mapped_values(personal_keywords_raw)
-    logger.info(f"personal_keywords_raw = {personal_keywords_raw}")
+    
     logger.info(f"personal_keywords = {personal_keywords}")
     
     # 여행 목적 매핑
     travel_purposes_raw = [map_doc_to_keyword(schema, doc.features.get(schema, 0), TRAVEL_PURPOSE_MAPPINGS) for schema in TRAVEL_PURPOSE_MAPPINGS.keys()]
     travel_purposes = flatten_mapped_values(travel_purposes_raw)
-    logger.info(f"travel_purposes_raw = {travel_purposes_raw}")
+    
     logger.info(f"travel_purposes = {travel_purposes}")
 
     return UserFeaturesAnalysisResponse(
