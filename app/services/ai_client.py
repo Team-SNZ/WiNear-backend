@@ -19,5 +19,3 @@ async def request_recommendations(payload: Dict[str, Any]) -> Dict[str, Any]:
         resp = await client.post(url, json=payload)
         resp.raise_for_status()
         return resp.json()
-
-
