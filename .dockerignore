@@ -1,0 +1,40 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Packaging
+*.egg-info/
+.eggs/
+
+# Test / coverage
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtualenv
+env/
+venv/
+.venv/
+ENV/
+
+# Git / IDE
+.git
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+.DS_Store
+
+# Logs / temp
+*.log
+logs/
+tmp/
+
+# Secrets
+.env
+*.pem
+*.key
+*.crt
