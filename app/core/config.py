@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     # Redis 설정
     redis_url: str = "redis://localhost:6379/0"
 
-    # 외부 AI 백엔드 설정
-    ai_backend_url: str = "http://host.docker.internal:8081"
-    ai_backend_recommendations_path: str = "/api/recommendations"
-    ai_backend_timeout_seconds: float = 15.0
+    # 외부 AI 백엔드 설정 (SNZ_RecSys)
+    ai_backend_url: str = "http://winear-recsys-agent:8000"  # SNZ_RecSys 서버 (Docker Compose)
+    ai_backend_recommendations_path: str = "/agent/recommend"
+    ai_backend_timeout_seconds: float = 30.0
 
     model_config = SettingsConfigDict(
         env_file=".env",

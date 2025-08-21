@@ -13,6 +13,7 @@ from .core.config import get_settings
 from .routers.user_features import router as user_features_router
 from .routers.chat import router as chat_router
 from .routers.user_summary import router as user_summary_router
+from .routers.recommend import router as recommend_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -88,3 +89,4 @@ def health() -> dict[str, str]:
 app.include_router(user_features_router)
 app.include_router(chat_router)
 app.include_router(user_summary_router)
+app.include_router(recommend_router)
