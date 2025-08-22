@@ -1,4 +1,4 @@
-name: recsys-agent - build & push (multi-arch) + deploy
+name: backend - build & push (multi-arch) + deploy
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     env:
-      IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/winear-recsys-agent
+      IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/winear-backend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,6 +73,6 @@ jobs:
           script: |
             set -e
             cd /home/ubuntu/stack
-            docker compose pull
-            docker compose up -d
+            docker compose -f compose.yml -f compose.prod.yml pull winear-backend
+            docker compose -f compose.yml -f compose.prod.yml up -d --no-build winear-backend
             docker image prune -f
