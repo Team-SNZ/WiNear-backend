@@ -12,8 +12,8 @@ def _serialize(doc: dict[str, Any]) -> UserSummaryResponse:
         id=str(doc["_id"]),
         user_id=str(doc.get("ID")) if doc.get("ID") is not None else doc.get("user_id"),
         summary=str(doc.get("Summary", "")),
-        created_at=doc.get("created_at"),
-        updated_at=doc.get("updated_at"),
+        created_at=doc.get("createdAt"),
+        updated_at=doc.get("updatedAt"),
     )
 
 
