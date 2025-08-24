@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.services.analysis_result import get_user_analysis_data
 
 from ..repositories.user_features_repository import (
-    create_user_features,
+    upsert_user_features,
     delete_user_features_by_oid,
     delete_user_features_by_user_id,
     get_user_features_by_oid,
@@ -31,7 +31,7 @@ async def create_route(
     payload: UserFeaturesCreate,
     db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> dict[str, str]:
-    new_id = await create_user_features(db, payload)
+    new_id = await upsert_user_features(db, payload)
     return {"id": new_id}
 
 

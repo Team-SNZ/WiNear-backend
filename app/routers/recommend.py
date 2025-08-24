@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 from fastapi import APIRouter, HTTPException, Depends
-from motor.motor_asyncio import AsyncIOMotorCollection
+from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 
+from app.constants.result_keyword_ver2 import PERSONAL_KEYWORD_MAPPINGS, TRAVEL_PURPOSE_MAPPINGS, TRAVEL_KEYWORD_MAPPINGS
+from ..services.analysis_result import get_user_analysis_data
 from ..schemas.recommend import (
     RecommendRequest, 
     RecommendResponse,
@@ -15,7 +17,7 @@ from ..schemas.recommend import (
     TravelInfo,
 )
 from ..services.ai_recommend_client import get_ai_recommend_client, AIRecommendClient
-from ..dependencies.db import get_user_features_collection, get_travel_info_collection, get_travel_url_collection
+from ..dependencies.db import get_db, get_user_features_collection, get_travel_info_collection, get_travel_url_collection
 
 logger = logging.getLogger(__name__)
 
@@ -60,10 +62,11 @@ async def get_recommendations(
 @router.post("/user-profile", summary="사용자 프로필 일괄 조회")
 async def get_user_profiles(
     req: UserProfileRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
     features_collection: AsyncIOMotorCollection = Depends(get_user_features_collection),
 ) -> UserProfileResponse:
     """
-    여러 사용자의 프로필 정보를 MongoDB에서 조회
+    여러 사용자의 프로필 정보를 MongoDB에서 조회하고 분석된 키워드 포함
     """
     try:
         logger.info(f"사용자 프로필 조회 요청: {len(req.user_ids)}명")
@@ -72,13 +75,66 @@ async def get_user_profiles(
         
         # 각 사용자 ID에 대해 MongoDB 조회
         async for doc in features_collection.find({"ID": {"$in": req.user_ids}}):
-            user_profile = UserProfile(
-                ID=doc["ID"],
-                name=doc.get("name", "알 수 없음"),
-                gender=doc.get("gender", "알 수 없음"),
-                age=doc.get("age", 0),
-                Features=doc.get("Features", {}),
-            )
+            user_id = doc["ID"]
+            
+            # 기본 프로필 정보
+            user_profile_data = {
+                "ID": user_id,
+                "name": doc.get("name", "알 수 없음"),
+                "gender": doc.get("gender", "알 수 없음"),
+                "age": doc.get("age", 0)
+            }
+            
+            # Features에서 특정 키워드만 추출
+            features = doc.get("Features", {})
+            
+            # Features에서 원본 값 추출
+            raw_keywords = {
+                "시간약속": features.get("시간약속", ""),
+                "의견수용": features.get("의견수용", ""),
+                "여행희망지역": features.get("여행희망지역", []),
+                "여행목적": features.get("여행목적", []),
+            }
+            
+            # 매핑된 키워드로 변환
+            keywords = {}
+            
+            # 개인 특성 키워드 매핑
+            if raw_keywords["시간약속"]:
+                keywords["시간약속"] = PERSONAL_KEYWORD_MAPPINGS.get("시간약속", {}).get(
+                    raw_keywords["시간약속"], raw_keywords["시간약속"]
+                )
+            
+            if raw_keywords["의견수용"]:
+                keywords["의견수용"] = PERSONAL_KEYWORD_MAPPINGS.get("의견수용", {}).get(
+                    raw_keywords["의견수용"], raw_keywords["의견수용"]
+                )
+            
+            # 여행 키워드 매핑
+            if raw_keywords["여행희망지역"]:
+                keywords["여행희망지역"] = TRAVEL_KEYWORD_MAPPINGS.get("여행희망지역", {}).get(
+                    raw_keywords["여행희망지역"], raw_keywords["여행희망지역"]
+                )
+            
+            # 여행 목적 매핑 (리스트일 수 있음)
+            if raw_keywords["여행목적"]:
+                if isinstance(raw_keywords["여행목적"], str):
+                    keywords["여행목적"] = TRAVEL_PURPOSE_MAPPINGS.get("여행목적", {}).get(
+                        raw_keywords["여행목적"], raw_keywords["여행목적"]
+                    )
+                elif isinstance(raw_keywords["여행목적"], list):
+                    mapped_purposes = []
+                    for purpose in raw_keywords["여행목적"]:
+                        mapped_purpose = TRAVEL_PURPOSE_MAPPINGS.get("여행목적", {}).get(purpose, purpose)
+                        mapped_purposes.append(mapped_purpose)
+                    keywords["여행목적"] = mapped_purposes
+            
+            # 선택된 Features 키워드를 프로필 데이터에 추가
+            user_profile_data.update({
+                "keywords": keywords,
+            })
+
+            user_profile = UserProfile(**user_profile_data)
             users.append(user_profile)
         
         logger.info(f"사용자 프로필 조회 완료: {len(users)}명")
