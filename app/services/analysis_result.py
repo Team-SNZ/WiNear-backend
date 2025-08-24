@@ -3,7 +3,7 @@ from typing import List, Any
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from ..repositories.user_features_repository import get_user_features_by_user_id
 from ..schemas.user_features import UserFeaturesAnalysisResponse
-from ..constants.result_keyword import POLYGON_LABELS, NUMERIC_MAPPINGS, TRAVEL_KEYWORD_MAPPINGS, PERSONAL_KEYWORD_MAPPINGS, TRAVEL_PURPOSE_MAPPINGS
+from ..constants.result_keyword_ver2 import POLYGON_LABELS, NUMERIC_MAPPINGS, TRAVEL_KEYWORD_MAPPINGS, PERSONAL_KEYWORD_MAPPINGS, TRAVEL_PURPOSE_MAPPINGS
 
 import logging
 

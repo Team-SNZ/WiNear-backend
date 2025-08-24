@@ -27,7 +27,7 @@ class UserProfile(BaseModel):
     name: str = Field(..., description="이름")
     gender: str = Field(..., description="성별")
     age: int = Field(..., description="나이")
-    Features: dict = Field(..., description="사용자 특징")
+    keywords: dict = Field(..., description="사용자 특징 키워드 목록")
 
 
 class TravelRequest(BaseModel):
@@ -43,5 +43,3 @@ class TravelInfo(BaseModel):
     title: str = Field(..., description="여행 패키지 제목")
     hashtags: list[str] = Field(..., description="해시태그 목록")
     url: str = Field(..., description="여행 패키지 URL")
-
-
